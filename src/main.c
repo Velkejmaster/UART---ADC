@@ -1,7 +1,6 @@
 #include "stm8s.h"
 #include "milis.h"
 
-/*#include "delay.h"*/
 #include <stdio.h>
 #include "stm8s_adc2.h"
 #include "uart1.h"
@@ -29,7 +28,7 @@ void setup(void)
 
     init_milis();
     init_uart1();
-}
+
 
     // Adc setup
     // na pinech/vstupech ADC_IN2 (PB4) a ADC_IN3 (PB5) vypneme vstupní buffer
@@ -50,11 +49,14 @@ void setup(void)
     ADC2_Cmd(ENABLE);
     // počkáme než se AD převodník rozběhne (~7us)
     ADC2_Startup_Wait();
+}
 
 int main(void)
 {
     uint32_t time = 0;
+    uint16_t nap;
     uint16_t ADCx;
+    uint16_t tep;
     setup();
 
     while (1) {
@@ -63,7 +65,9 @@ int main(void)
             LED_REVERSE; 
             time = milis();
             ADCx = ADC_get(ADC2_CHANNEL_4);
-            printf("%ld %d\n\r", time,ADCx);
+            nap = (uint32_t)3300 * ADCx /1024;
+            tep = ((uint32_t)33000* ADCx - 4096000) / 19968;
+            printf("ADCx = %d; U = %dmV T=%d.%d \n\r", ADCx, nap, tep/10, tep%10);
         }
 
         /*LED_REVERSE; */
